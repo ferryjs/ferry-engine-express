@@ -4,7 +4,7 @@ import express from 'express';
 
 class Express {
   constructor(specification, database) {
-    this.name = 'Default';
+    this.name = 'Express';
     this.specification = specification;
     this.app = express();
 

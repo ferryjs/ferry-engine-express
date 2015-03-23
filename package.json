@@ -1,7 +1,8 @@
 {
   "name": "ferry-express",
   "version": "1.0.0",
-  "description": "",
+  "description": "Express router adapter for FerryJS.",
+  "license": "MIT",
   "main": "lib/Express",
   "scripts": {
     "test": "mocha",
@@ -10,11 +11,11 @@
     "postinstall": "npm run build",
     "prepublish": "npm run build"
   },
-  "license": "MIT",
-  "devDependencies": {
-    "babel": "^4.7.12"
-  },
   "dependencies": {
-    "express": "^4.12.2"
+    "express": "^4.12.3",
+    "ferry": "ferryjs/ferry#development"
+  },
+  "devDependencies": {
+    "babel": "^4.7.16"
   }
 }

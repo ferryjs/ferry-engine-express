@@ -2,74 +2,81 @@
 
 import express from 'express';
 
-class Express {
-  constructor(specification, database) {
-    this.name = 'Express';
-    this.specification = specification;
-    this.app = express();
+import {Router} from 'ferry';
 
-    this.initialize();
+class ExpressAdapter extends Router {
+
+  constructor(config = {}) {
+    super(config);
+    this.name = 'Express';
+    this.app = express();
   }
 
-  route(type, model) {
+  route(action, resource) {
 
-    switch (type) {
+    switch (action) {
 
       case 'index':
         return (req, res)=> {
-          res.send('Index');
+          res.send(action);
         };
         break;
 
       case 'find':
         return (req, res)=> {
-          res.send('Find');
+          res.send(action);
         };
         break;
 
       case 'create':
         return (req, res)=> {
-          res.send('Create');
+          res.send(action);
         };
         break;
 
       case 'update':
         return (req, res)=> {
-          res.send('Update');
+          res.send(action);
         };
         break;
 
       case 'delete':
         return (req, res)=> {
-          res.send('Delete');
+          res.send(action);
         };
         break;
+
     }
 
   }
 
-  initialize() {
-    let Router = express.Router();
+  initialize(basePath, routes, callback) {
 
-    for(let path in this.specification.routes) {
+    let expressRouter = express.Router();
 
-      for(let method in this.specification.routes[path]) {
+    for (let path in routes) {
 
-        let action = this.specification.routes[path][method].operationId.split(':')[1].toLowerCase();
+      for (let method in routes[path]) {
 
-        Router[method](path, this.route(action));
+        let action = routes[path][method].operationId.split(':')[1].toLowerCase();
+
+        expressRouter[method](path, this.route(action));
+
       }
     };
 
-    this.app.use(
-      this.specification.basePath,
-      Router
-    );
+    this.app.use(basePath, expressRouter);
+
+    if (typeof callback === 'function') {
+      callback();
+    }
+
   }
 
-  start(port = 3000) {
-    this.app.listen(port);
+  start(port = 3000, callback) {
+    this.app.listen(port, callback);
   }
+
 }
 
-export default Express;
+export default ExpressAdapter;

@@ -1,15 +1,19 @@
 {
   "name": "ferry-express",
   "version": "1.0.0",
-  "description": "Express router adapter for FerryJS.",
+  "description": "Express router engine adapter for Ferry.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ferryjs/ferry-express"
+  },
   "main": "lib/Express",
   "scripts": {
     "test": "mocha",
     "build": "babel src --out-dir lib --source-maps",
     "watch": "babel src --out-dir lib --watch --source-maps",
-    "postinstall": "npm run build",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "express": "^4.12.3",

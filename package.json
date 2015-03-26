@@ -10,7 +10,7 @@
   "main": "lib/Express",
   "scripts": {
     "test": "mocha",
-    "build": "babel src --out-dir lib --source-maps",
+    "build": "rimraf lib && babel src --out-dir lib --source-maps",
     "watch": "npm run build -- --watch",
     "prepublish": "npm run build",
     "postinstall": "npm run build"
@@ -20,6 +20,7 @@
     "ferry": "ferryjs/ferry#development"
   },
   "devDependencies": {
-    "babel": "^4.7.16"
+    "babel": "^4.7.16",
+    "rimraf": "^2.3.2"
   }
 }

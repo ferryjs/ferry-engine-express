@@ -72,28 +72,56 @@ class ExpressAdapter extends Router {
    * Route configuration middleware creator.
    *
    * @param {String} resourceType
+   * @param {String} operation
    * @returns {Function} Middleware handler.
    */
-  configureRoute(resourceType) {
+  configureRoute(resourceType, operation) {
     return (req, res, next) => {
       req.resource = req.resource || {};
       req.resource.type = resourceType;
+      req.resource.operation = operation;
+      req.resource.properties = {};
       return next();
     };
+  }
+
+  /**
+   * Validation middleware creator.
+   *
+   * @returns {Function} Middleware handler.
+   */
+  validator() {
+    return (req, res, next) => {
+      if (! req.body || Object.keys(req.body).length > 0) {
+        this.ferry.specification.validateResource(req.resource.type, req.body, req.resource.operation, (result) => {
+          if (result === true) {
+            req.resource.properties = req.body;
+            return next();
+          }
+          return res.status(422).json(result);
+        });
+      } else {
+        return next();
+      }
+    }
   }
 
   initialize(basePath, routes, callback) {
 
     let expressRouter = express.Router();
 
+    let validator = this.validator();
+
     for (let path in routes) {
 
       for (let method in routes[path]) {
 
+        // @todo Generalize operationId as it's a Swagger concept.
+        let operation = routes[path][method].operationId;
         let action = routes[path][method].operationId.split(':')[1].toLowerCase();
         let resourceType = routes[path][method].operationId.split(':')[0].toLowerCase();
 
-        expressRouter[method](path, this.configureRoute(resourceType), this.route(action));
+        expressRouter[method](path, this.configureRoute(resourceType, operation), validator, this.route(action));
 
       }
 

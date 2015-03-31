@@ -13,13 +13,19 @@ class ExpressAdapter extends Router {
     this.app = express();
   }
 
-  route(action, resourceType) {
+  /**
+   * Route handler middleware creator.
+   *
+   * @param {String} action
+   * @returns {Function} Middleware handler.
+   */
+  route(action) {
 
     switch (action) {
 
       case 'index':
         return (req, res) => {
-          this.ferry.storage.find(resourceType, req.query, function (resources) {
+          this.ferry.storage.find(req.resource.type, req.query, function (resources) {
             res.json(resources);
           });
         };
@@ -27,7 +33,7 @@ class ExpressAdapter extends Router {
 
       case 'find':
         return (req, res) => {
-          this.ferry.storage.findById(resourceType, req.params.id, function (resource) {
+          this.ferry.storage.findById(req.resource.type, req.params.id, function (resource) {
             res.json(resource);
           });
         };
@@ -35,7 +41,7 @@ class ExpressAdapter extends Router {
 
       case 'create':
         return (req, res) => {
-          this.ferry.storage.create(resourceType, req.body, function (resource) {
+          this.ferry.storage.create(req.resource.type, req.body, (resource) => {
             res.json(resource);
           });
         };
@@ -43,7 +49,7 @@ class ExpressAdapter extends Router {
 
       case 'update':
         return (req, res) => {
-          this.ferry.storage.update(resourceType, req.params.id, req.body, function (resource) {
+          this.ferry.storage.update(req.resource.type, req.params.id, req.body, function (resource) {
             res.json(resource);
           });
         };
@@ -51,7 +57,7 @@ class ExpressAdapter extends Router {
 
       case 'delete':
         return (req, res) => {
-          this.ferry.storage.destroy(resourceType, req.params.id, function () {
+          this.ferry.storage.destroy(req.resource.type, req.params.id, function () {
             //res.json(resource);
             res.json({ status: 'ok' });
           });
@@ -60,6 +66,20 @@ class ExpressAdapter extends Router {
 
     }
 
+  }
+
+  /**
+   * Route configuration middleware creator.
+   *
+   * @param {String} resourceType
+   * @returns {Function} Middleware handler.
+   */
+  configureRoute(resourceType) {
+    return (req, res, next) => {
+      req.resource = req.resource || {};
+      req.resource.type = resourceType;
+      return next();
+    };
   }
 
   initialize(basePath, routes, callback) {
@@ -73,7 +93,7 @@ class ExpressAdapter extends Router {
         let action = routes[path][method].operationId.split(':')[1].toLowerCase();
         let resourceType = routes[path][method].operationId.split(':')[0].toLowerCase();
 
-        expressRouter[method](path, this.route(action, resourceType));
+        expressRouter[method](path, this.configureRoute(resourceType), this.route(action));
 
       }
 

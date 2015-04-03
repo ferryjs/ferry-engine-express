@@ -16,6 +16,7 @@
     "postinstall": "npm run build"
   },
   "dependencies": {
+    "body-parser": "^1.12.2",
     "express": "^4.12.3",
     "ferry": "ferryjs/ferry#development"
   },
